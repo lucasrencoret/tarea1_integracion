@@ -64,15 +64,39 @@ def status():
 
     return 
  
+def texto():
+
+    response.status = 201
+    import urllib2
+    
+    mensaje = urllib2.urlopen('https://s3.amazonaws.com/files.principal/texto.txt').read()
+    
+
+    h = sha256()
+    h.update(mensaje)
+    respuesta = h.hexdigest()
+
+    import gluon.contrib.simplejson
+    
+    retorno = dict(text=mensaje, hash=respuesta)
+    return gluon.contrib.simplejson.dumps(retorno)
+
+    
+
+    
+    
+
+    return  
 def validarFirma():
     """
     this is example of API with access control
     WEB2PY provides Hypermedia API (Collection+JSON) Experimental
     """
     from gluon.contrib.hypermedia import Collection
-
+    response.status=200
     mensaje = request.post_vars.mensaje
     mensaje_hasheado = request.post_vars.hash
+
     if (mensaje==None or mensaje_hasheado==None):
         response.status = 400
         return dict(mensaje=mensaje, valido='false')
@@ -82,13 +106,17 @@ def validarFirma():
     h.update(mensaje)
     respuesta = h.hexdigest()
 
-    response.flash = h.hexdigest()
     valido = True
     if (mensaje_hasheado.lower() == respuesta):
         valido = True
     else:
         valido = False
+        
     valido_letras = str(valido).lower()
-    return dict(mensaje=mensaje, valido=valido_letras)
+
+    import gluon.contrib.simplejson
+    
+    retorno = dict(mensaje=mensaje, valido=valido)
+    return gluon.contrib.simplejson.dumps(retorno)
 
     
